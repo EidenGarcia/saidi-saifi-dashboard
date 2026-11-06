@@ -119,6 +119,7 @@
   .rl-chart-year { min-height: 240px; }
   .rl-sw-dash { display: inline-block; width: 16px; height: 0; border-top: 2px dashed var(--color-fg-muted); margin-right: 6px; vertical-align: 3px; }
   .rl-chart-year rect.rl-col { cursor: pointer; }
+  .rl-chart-year svg text.rl-seg-t { fill: #fff; stroke: none; font-size: 11px; pointer-events: none; }
   .rl-target { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-xs); font-variant-numeric: tabular-nums; }
   .rl-target[data-on="true"] .rl-target-off, .rl-target[data-on="false"] .rl-target-on { display: none; }
   .rl-sw-dash.rl-base { border-top-color: var(--color-bad); }
@@ -203,7 +204,9 @@
       <h3 class="rl-card-title" id="year-title">By fiscal year</h3>
       <p class="rl-note" id="year-note">Full-year value for each fiscal year, with the change from the year before. The selected year is highlighted; click a column to select it.</p>
       <div class="rl-legend" id="year-legend">
-        <span><span class="rl-sw" id="sw-year"></span>Selected year</span>
+        <span id="leg-year-sel"><span class="rl-sw" id="sw-year"></span>Selected year</span>
+        <span id="leg-year-dist" hidden><span class="rl-sw" id="sw-year-dist"></span>Distribution</span>
+        <span id="leg-year-ts" hidden><span class="rl-sw" id="sw-year-ts"></span>Transmission &amp; substation</span>
         <span><span class="rl-sw-dash"></span>Trend: <span class="rl-delta" data-source="year_trend" data-field="slope">—</span> <span id="trend-unit">min</span> per year, fitted over <span data-source="year_trend" data-field="years">—</span> years</span>
         <span class="rl-leg-tgt"><span class="rl-sw-dash rl-base"></span>OMA baseline <span data-source="oma_targets" data-field="baseline" class="rl-tgt-base">—</span></span>
         <span class="rl-leg-tgt"><span class="rl-sw-dash rl-bench"></span>Benchmark <span data-source="oma_targets" data-field="benchmark" class="rl-tgt-bench">—</span></span>
@@ -283,7 +286,7 @@
           </div>
         </div>
       </div>
-      <p class="rl-note" id="map-note">Each of LUMA's six regions colored by its total for the selected year, metric, part of the grid and outage type. Click a region to drill down to its districts. Municipality outlines are from U.S. Census Bureau boundaries.</p>
+      <p class="rl-note" id="map-note">Each of LUMA's six regions colored by its value for the selected year, metric, part of the grid and outage type (the customer-weighted average of its districts). Click a region to drill down to its districts. Municipality outlines are from U.S. Census Bureau boundaries.</p>
       <div class="rl-heatlegend"><span id="map-lo">—</span><span class="rl-ramp" id="map-ramp"></span><span id="map-hi">—</span></div>
       <div class="rl-chart" id="map-chart" data-source="area_fy district_fy district_municipalities"></div>
     </div>
@@ -294,7 +297,7 @@
     <div class="rl-grid">
     <div class="rl-card" id="card-region-table">
       <h3 class="rl-card-title">Region scorecard</h3>
-      <p class="rl-note">LUMA's six operating regions for the selected fiscal year and part of the grid, each region's districts weighted by customers served, with change from the year before. Click a header to sort, or a region to filter the page to it and see its districts on the map.</p>
+      <p class="rl-note">LUMA's six operating regions for the selected fiscal year and part of the grid. Each region's value is the customer-weighted average of its districts, not their sum, so it falls between its best and worst district. Change is from the year before. Click a header to sort, or a region to filter the page to it and see its districts on the map.</p>
       <div class="rl-tablebox">
         <table class="rl-table" id="region-table" data-source="region_fy" data-row-key="fiscal_year,region,kind">
           <thead>
@@ -383,7 +386,7 @@
       <p><span class="rl-term">OMA baseline and benchmark</span> — The baseline is the minimum performance the Energy Bureau measures LUMA against under its Operation and Maintenance Agreement (OMA): SAIDI 1,243 minutes and SAIFI 10.6 interruptions per customer per year. The benchmark is the long-term goal based on comparable U.S. utilities: SAIDI 102 minutes and SAIFI 1.0. Lower is better, and both apply to system-wide permanent T&amp;D figures, so the page shows them only for that view.</p>
       <p><span class="rl-term">Permanent and temporary</span> — Permanent (sustained) interruptions last more than 5 minutes; they are what SAIDI, SAIFI and CAIDI count under IEEE 1366, and the workbook reports them directly. Temporary (momentary) interruptions last 5 minutes or less; their frequency is MAIFI. Temporary figures are rebuilt from the outage log, and All adds the two together.</p>
       <p><span class="rl-term">Part of the grid</span> — Distribution covers primary and feeder outages; transmission &amp; substation covers outages recorded as substation events. Together they make the T&amp;D total.</p>
-      <p><span class="rl-term">Regions and districts</span> — LUMA's six operating regions and 16 districts follow its official map of regions, districts and customer counts (February 2024): San Juan region (San Juan, Canóvanas, Fajardo districts), Bayamón (Bayamón, Toa Baja), Caguas (Caguas, Humacao, Barranquitas), Arecibo (Arecibo, Vega Baja, Utuado), Mayagüez (Mayagüez, Aguadilla) and Ponce (Ponce, Yauco, Guayama). A region's figures weight its districts by customers served; the customer counts worked out from the outage log match that map exactly.</p>
+      <p><span class="rl-term">Regions and districts</span> — LUMA's six operating regions and 16 districts follow its official map of regions, districts and customer counts (February 2024): San Juan region (San Juan, Canóvanas, Fajardo districts), Bayamón (Bayamón, Toa Baja), Caguas (Caguas, Humacao, Barranquitas), Arecibo (Arecibo, Vega Baja, Utuado), Mayagüez (Mayagüez, Aguadilla) and Ponce (Ponce, Yauco, Guayama). SAIDI and SAIFI are averages per customer, so a region's figure is the customer-weighted average of its districts (not their sum) and always falls between its best and worst district; the customer counts worked out from the outage log match that map exactly.</p>
       <p><span class="rl-term">Municipalities on the map</span> — Outlines come from the U.S. Census Bureau's cartographic boundary files (simplified, via the open-source us-atlas package). LUMA's map does not list which municipalities each district serves, so each municipality is placed in the district whose customer total it completes. For 10 districts the municipal counts add up to the district total exactly. In the west, south and central-east, district lines cut through a few municipalities, so six districts are off by about 500 customers each (under 1%).</p>
       <p>All figures are sustained outages calculated under the IEEE 1366 standard, with major event days (TMED) excluded so storms such as hurricanes do not distort normal performance, and fiscal years run July to June. System and district figures are the workbook's own reported values; region figures, the cause breakdown and major-event amounts are built from them and from the outage-log sheets, and match the reported totals from FY2023 on. Toa Baja is reported as a district from FY2025, so the Bayamón region covers Bayamón alone before then.</p>
     </div>
@@ -898,7 +901,16 @@
     const t = dash.data('year_trend');
     const kind = RL.kind(), kk = RL.kindData();
     const trend = t.status === 'ok' ? t.data.find((r) => r.area === area && r.part === part && r.kind === kk && r.metric === key) : null;
-    document.getElementById('sw-year').style.background = dash.colors[0];
+    const stacked = M.stack && part === 'td';
+    document.getElementById('sw-year').style.background = part === 'ts' ? dash.colors[1] : dash.colors[0];
+    document.getElementById('sw-year-dist').style.background = dash.colors[0];
+    document.getElementById('sw-year-ts').style.background = dash.colors[1];
+    document.getElementById('leg-year-sel').hidden = stacked;
+    document.getElementById('leg-year-dist').hidden = !stacked;
+    document.getElementById('leg-year-ts').hidden = !stacked;
+    document.getElementById('year-note').textContent = stacked
+      ? 'Full-year value for each fiscal year, split into distribution and transmission & substation so you can see which part is driving the change. The selected year is in full color; click a column to select it.'
+      : 'Full-year value for each fiscal year, with the change from the year before. The selected year is highlighted; click a column to select it.';
     document.getElementById('trend-unit').textContent = key === 'saifi' ? 'interruptions' : 'min';
     document.querySelectorAll('#year-legend [data-source="year_trend"]').forEach((el) => {
       el.setAttribute('data-where', RL.where({ area, part, kind: kk, metric: key }));
@@ -937,9 +949,31 @@
     svg.append('g').selectAll('text').data(rows).join('text')
       .attr('x', (r) => x(r.fiscal_year) + x.bandwidth() / 2).attr('y', H - 6).attr('text-anchor', 'middle')
       .attr('class', (r) => (r.fiscal_year === fy ? 'rl-strong-t' : null)).text((r) => r.fiscal_year);
+    // Distribution and transmission & substation rows for the same year, area and outage kind.
+    const partRow = (r, p) => d.data.find((o) => o.area === area && o.part === p && o.kind === kk && o.fiscal_year === r.fiscal_year);
+    const segs = stacked ? rows.flatMap((r) => {
+      const dr = partRow(r, 'dist'), tr = partRow(r, 'ts');
+      const dv = dr ? dr[key] ?? 0 : 0, tv = tr ? tr[key] ?? 0 : 0;
+      return [{ r, p: 'dist', y0: 0, y1: dv, v: dv, chg: dr ? dr[chgKey] : null }, { r, p: 'ts', y0: dv, y1: dv + tv, v: tv, chg: tr ? tr[chgKey] : null }];
+    }) : [];
+    const colG = svg.append('g');
+    if (stacked) {
+      colG.selectAll('rect').data(segs).join('rect').attr('class', 'rl-col')
+        .attr('x', (sg) => bx(sg.r)).attr('width', bw).attr('y', (sg) => y(sg.y1)).attr('height', (sg) => Math.max(0, y(sg.y0) - y(sg.y1)))
+        .attr('rx', (sg) => (sg.p === 'ts' ? 4 : 0))
+        .attr('fill', (sg) => (sg.p === 'dist' ? dash.colors[0] : dash.colors[1]))
+        .attr('opacity', (sg) => (sg.r.fiscal_year === fy ? 1 : 0.45));
+      if (bw >= 46) colG.selectAll('text').data(segs.filter((sg) => y(sg.y0) - y(sg.y1) >= 18)).join('text')
+        .attr('class', 'rl-seg-t').attr('text-anchor', 'middle')
+        .attr('x', (sg) => bx(sg.r) + bw / 2).attr('y', (sg) => (y(sg.y0) + y(sg.y1)) / 2).attr('dy', '0.35em')
+        .text((sg) => M.f(sg.v));
+    } else {
+      colG.selectAll('rect').data(rows).join('rect').attr('class', 'rl-col')
+        .attr('x', bx).attr('width', bw).attr('y', (r) => y(r[key])).attr('height', (r) => Math.max(0, y(0) - y(r[key]))).attr('rx', 4)
+        .attr('fill', (r) => (r.fiscal_year === fy ? (part === 'ts' ? dash.colors[1] : dash.colors[0]) : 'var(--cds-chart-muted)'));
+    }
     const cols = svg.append('g').selectAll('rect').data(rows).join('rect').attr('class', 'rl-col')
-      .attr('x', bx).attr('width', bw).attr('y', (r) => y(r[key])).attr('height', (r) => Math.max(0, y(0) - y(r[key]))).attr('rx', 4)
-      .attr('fill', (r) => (r.fiscal_year === fy ? dash.colors[0] : 'var(--cds-chart-muted)'));
+      .attr('x', (r) => x(r.fiscal_year)).attr('width', x.bandwidth()).attr('y', mt).attr('height', H - mb - mt).attr('fill', 'transparent');
     if (trend && rows.length >= 2) {
       const a = rows[0], b = rows[rows.length - 1];
       svg.append('line')
@@ -962,17 +996,24 @@
     if (!narrow) lab.append('text').attr('text-anchor', 'middle').attr('y', 0)
       .style('fill', (r) => (r[chgKey] == null || r[chgKey] === 0 ? 'var(--color-fg-muted)' : r[chgKey] < 0 ? 'var(--color-ok)' : 'var(--color-bad)'))
       .text((r) => (r[chgKey] == null ? '' : d3.format('+.1%')(r[chgKey])));
+    const pct = (v) => (v == null ? '—' : d3.format('+.1%')(v));
     cols.on('pointermove', (event, r) => {
-      cols.attr('opacity', (o) => (o === r ? 1 : 0.6));
+      if (!stacked) colG.selectAll('rect').attr('opacity', (o) => (o === r ? 1 : 0.6));
       const [px, py] = d3.pointer(event, box);
+      const parts = stacked ? segs.filter((sg) => sg.r === r).map((sg) => ({
+        color: sg.p === 'dist' ? dash.colors[0] : dash.colors[1],
+        name: (sg.p === 'dist' ? 'Distribution' : 'Transmission & substation') + ' (' + pct(sg.chg) + ')',
+        value: M.f(sg.v),
+      })) : [];
       tip.show(px, py, r.fiscal_year + ' · ' + RL.areaLabel(area), [
-        { name: RL.lab(M.key), value: M.f(r[key]) },
+        ...parts,
+        { name: stacked ? 'Total' : RL.lab(M.key), value: M.f(r[key]) },
         { name: 'Change vs ' + (r.prev_fiscal_year || 'prior year'), value: r[chgKey] == null ? '—' : d3.format('+.1%')(r[chgKey]) },
         { name: 'Trend line', value: fit(r) == null ? '—' : M.f(fit(r)) },
         ...(tgt ? [{ name: 'vs OMA baseline', value: d3.format('+.1%')((r[key] - tgt.baseline) / tgt.baseline) }] : []),
       ]);
     })
-      .on('pointerleave', () => { cols.attr('opacity', 1); tip.hide(); })
+      .on('pointerleave', () => { if (!stacked) colG.selectAll('rect').attr('opacity', 1); tip.hide(); })
       .on('click', (event, r) => dash.setParams({ fy: r.fiscal_year }));
   });
 }</script>
@@ -1157,7 +1198,7 @@
     document.getElementById('map-reset').hidden = area === 'System';
     document.getElementById('map-title').textContent = RL.lab(M.key) + ' by ' + layer + ' · ' + fy + (part === 'td' ? '' : ' · ' + RL.PART[part]) + (kind === 'permanent' ? '' : ' · ' + RL.KIND[kind]);
     document.getElementById('map-note').textContent = layer === 'region'
-      ? 'Each of LUMA\u2019s six regions colored by its total for the selected year, metric, part of the grid and outage type (its districts weighted by customers served). Click a region to drill down to its districts. Municipality outlines are from U.S. Census Bureau boundaries.'
+      ? 'Each of LUMA\u2019s six regions colored by its value for the selected year, metric, part of the grid and outage type. A region\u2019s value is the customer-weighted average of its districts, so it always falls between its best and worst district. Click a region to drill down to its districts. Municipality outlines are from U.S. Census Bureau boundaries.'
       : 'Each of LUMA\u2019s 16 districts colored by its own value; thick lines mark region borders, thinner ones district borders. Click a district to filter the page to it, or switch back to Regions. Municipality outlines are from U.S. Census Bureau boundaries.';
     box.querySelector('svg')?.remove();
     tip.hide();
